@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Importer/Importer.iml" filepath="$PROJECT_DIR$/Importer/Importer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ResearchCode.iml" filepath="$PROJECT_DIR$/ResearchCode.iml" />
+    </modules>
+  </component>
+</project>
