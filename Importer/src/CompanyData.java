@@ -1,7 +1,6 @@
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +14,13 @@ public class CompanyData {
     ArrayList<String> oneDay_bidReturn = new ArrayList<>();
     ArrayList<String> oneDay_askReturn = new ArrayList<>();
 
+    //Lagged Returns
+    private ArrayList<String> completeReturns = new ArrayList<>();
+    ArrayList<String> oneWeek_midRetrun = new ArrayList<>();
+    ArrayList<String> oneMonth_midReturn = new ArrayList<>();
+    ArrayList<String> threeMonth_midReturn = new ArrayList<>();
+    ArrayList<String> sixMonth_midReturn = new ArrayList<>();
+
     //Market Data
     ArrayList<String> mktCap = new ArrayList<>();
     ArrayList<String> volume = new ArrayList<>();
@@ -23,6 +29,12 @@ public class CompanyData {
     ArrayList<String> PB = new ArrayList<>();
     ArrayList<String> PE = new ArrayList<>();
     ArrayList<String> PS = new ArrayList<>();
+
+    //Volatility
+    ArrayList<String> oneWeek_Volatility = new ArrayList<>();
+    ArrayList<String> oneMonth_Volatility = new ArrayList<>();
+    ArrayList<String> threeMonth_Volatility = new ArrayList<>();
+    ArrayList<String> sixMonth_Volatility = new ArrayList<>();
 
     ArrayList<LocalDate> datum = new ArrayList<>();
     String name;
@@ -303,6 +315,182 @@ public class CompanyData {
 
     void dateAdd (Date sampleDate){
         datum.add(sampleDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+    }
+
+    private void completeReturn(Sheet sheet){
+        boolean tester;
+        int x = 1;
+
+        tester = (sheet.getRow(1).getCell(1).getCellTypeEnum()== CellType.NUMERIC && sheet.getRow(1).getCell(1).getNumericCellValue()!=0);
+        if(tester){
+            completeReturns.add(Double.toString(sheet.getRow(1).getCell(1).getNumericCellValue()));
+            x++;
+        }else {
+            do {
+                completeReturns.add("na");
+                x++;
+            }
+            while ((sheet.getRow(x).getCell(1).getCellTypeEnum() != CellType.NUMERIC || (sheet.getRow(x).getCell(1).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(x).getCell(1).getNumericCellValue() == 0)));
+        }
+
+        //Loop through all rows of a sheet
+        for(int i=x;i<sheet.getLastRowNum()+1;i++) {
+            tester = (sheet.getRow(i).getCell(1).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(i).getCell(1).getNumericCellValue() != 0);
+
+            if (tester) {
+                completeReturns.add(Double.toString(sheet.getRow(i).getCell(1).getNumericCellValue()));
+            } else {
+                completeReturns.add(Double.toString(sheet.getRow(i - 1).getCell(1).getNumericCellValue()));
+            }
+        }
+    }
+
+    void addLaggedReturns(Sheet sheet, String returnType){
+        boolean tester;
+        int x = 0;
+
+        this.completeReturn(sheet);
+
+        switch (returnType){
+            case "oneWeek":
+                //find first row with numeric value
+                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                if(tester){
+                    do {
+                        oneWeek_midRetrun.add("na");
+                        x++;
+                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                }
+
+                //Loop through all rows of a sheet
+                for(int i=x+4;i<completeReturns.size();i++) {
+                    oneWeek_midRetrun.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-4)))));
+                }
+                break;
+            case "oneMonth":
+                //find first row with numeric value
+                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                if(tester){
+                    do {
+                        oneMonth_midReturn.add("na");
+                        x++;
+                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                }
+
+                //Loop through all rows of a sheet
+                for(int i=x+20;i<sheet.getLastRowNum();i++) {
+                    oneMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-20)))));
+                }
+                break;
+            case "threeMonth":
+                //find first row with numeric value
+                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                if(tester){
+                    do {
+                        threeMonth_midReturn.add("na");
+                        x++;
+                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                }
+
+                //Loop through all rows of a sheet
+                for(int i=x+62;i<sheet.getLastRowNum();i++) {
+                    threeMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-62)))));
+                }
+                break;
+            case "sixMonth":
+                //find first row with numeric value
+                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                if(tester){
+                    do {
+                        sixMonth_midReturn.add("na");
+                        x++;
+                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                }
+
+                //Loop through all rows of a sheet
+                for(int i=x+124;i<sheet.getLastRowNum();i++) {
+                    sixMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-124)))));
+                }
+                break;
+            default:
+                System.out.println("Please specify the Type of Return (oneWeek, oneMonth, threeMonth, sixMonth)");
+                break;
+        }
+    }
+
+    void addVolatility(Sheet sheet, String duration){
+        boolean tester;
+        int x = 0;
+
+
+        this.completeReturn(sheet);
+        ArrayList<String> replacedReturn = new ArrayListExt().replace(completeReturns,"na", "0");
+
+        switch (duration){
+            case "oneWeek":
+                //find first row with numeric value
+                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                if(tester){
+                    do {
+                        oneWeek_midRetrun.add("na");
+                        x++;
+                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                }
+
+                //Loop through all rows of a sheet
+                for(int i=x+4;i<completeReturns.size();i++) {
+                    oneWeek_midRetrun.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-4)))));
+                }
+                break;
+            case "oneMonth":
+                //find first row with numeric value
+                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                if(tester){
+                    do {
+                        oneMonth_midReturn.add("na");
+                        x++;
+                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                }
+
+                //Loop through all rows of a sheet
+                for(int i=x+20;i<sheet.getLastRowNum();i++) {
+                    oneMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-20)))));
+                }
+                break;
+            case "threeMonth":
+                //find first row with numeric value
+                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                if(tester){
+                    do {
+                        threeMonth_midReturn.add("na");
+                        x++;
+                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                }
+
+                //Loop through all rows of a sheet
+                for(int i=x+62;i<sheet.getLastRowNum();i++) {
+                    threeMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-62)))));
+                }
+                break;
+            case "sixMonth":
+                //find first row with numeric value
+                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                if(tester){
+                    do {
+                        sixMonth_midReturn.add("na");
+                        x++;
+                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
+                }
+
+                //Loop through all rows of a sheet
+                for(int i=x+124;i<sheet.getLastRowNum();i++) {
+                    sixMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-124)))));
+                }
+                break;
+            default:
+                System.out.println("Please specify the Type of Return (oneWeek, oneMonth, threeMonth, sixMonth)");
+                break;
+        }
     }
 
     void returnsOut(){

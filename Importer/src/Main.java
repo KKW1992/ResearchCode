@@ -14,7 +14,7 @@ public class Main {
         // XSSFWorkbook, File
         OPCPackage pkg = OPCPackage.open(new File("C:\\Users\\kimwa\\OneDrive\\Documents\\Codes\\Matlab\\Data US\\US_Data_P1_1.xlsx"));
         XSSFWorkbook wb = new XSSFWorkbook(pkg);
-        Sheet sheet = wb.getSheetAt(42);
+        Sheet sheet = wb.getSheetAt(0);
         CompanyData comp = new CompanyData();
         GlobalData globalData = new GlobalData();
 
@@ -46,6 +46,13 @@ public class Main {
         comp.addCompanyData(sheet, "PB");
         comp.addCompanyData(sheet, "PE");
         comp.addCompanyData(sheet, "PS");
+
+
+        //Lagged Returns
+        comp.addLaggedReturns(sheet, "oneWeek");
+        comp.addLaggedReturns(sheet, "oneMonth");
+        comp.addLaggedReturns(sheet, "threeMonth");
+        comp.addLaggedReturns(sheet, "sixMonth");
 
         //comp.returnsOut();
         //comp.dataOut();
