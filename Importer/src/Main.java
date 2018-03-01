@@ -15,13 +15,12 @@ public class Main {
         OPCPackage pkg = OPCPackage.open(new File("C:\\Users\\kimwa\\OneDrive\\Documents\\Codes\\Matlab\\Data US\\US_Data_P1_1.xlsx"));
         XSSFWorkbook wb = new XSSFWorkbook(pkg);
         Sheet sheet = wb.getSheetAt(0);
-        CompanyData comp = new CompanyData();
+        CompanyData comp = new CompanyData(sheet);
         GlobalData globalData = new GlobalData();
 
 
         //Daten Import
         //========================================================================================================================================
-        comp.nameConstructor(sheet.getRow(0).getCell(0).getStringCellValue());
 
         for(int i=1;i<sheet.getLastRowNum()+1;i++) {
             comp.dateAdd(sheet.getRow(i).getCell(0).getDateCellValue());
@@ -29,13 +28,13 @@ public class Main {
         }
 
         //Add Company specific Returns
-        comp.addReturns(sheet, "Mid");
-        comp.addReturns(sheet, "Bid");
-        comp.addReturns(sheet, "Ask");
+        comp.addReturns("Mid");
+        comp.addReturns( "Bid");
+        comp.addReturns( "Ask");
 
         //Add Company specific Market Data
-        comp.addMarketData(sheet,"MktCap");
-        comp.addMarketData(sheet, "Volume");
+        comp.addMarketData("MktCap");
+        comp.addMarketData( "Volume");
 
         //Global Data
         globalData.addMarketData(sheet, "S&P");
@@ -43,19 +42,22 @@ public class Main {
         globalData.addMarketData(sheet, "RiskFree");
 
         //Company Data
-        comp.addCompanyData(sheet, "PB");
-        comp.addCompanyData(sheet, "PE");
-        comp.addCompanyData(sheet, "PS");
+        comp.addCompanyData( "PB");
+        comp.addCompanyData( "PE");
+        comp.addCompanyData( "PS");
 
 
         //Lagged Returns
-        comp.addLaggedReturns(sheet, "oneWeek");
-        comp.addLaggedReturns(sheet, "oneMonth");
-        comp.addLaggedReturns(sheet, "threeMonth");
-        comp.addLaggedReturns(sheet, "sixMonth");
+        comp.addLaggedReturns( "oneWeek");
+        comp.addLaggedReturns( "oneMonth");
+        comp.addLaggedReturns( "threeMonth");
+        comp.addLaggedReturns( "sixMonth");
 
-        //comp.returnsOut();
-        //comp.dataOut();
+        //Volatility
+        comp.addVolatility( "oneWeek");
+        comp.addVolatility( "oneMonth");
+        comp.addVolatility( "threeMonth");
+        comp.addVolatility( "sixMonth");
     }
 }
 

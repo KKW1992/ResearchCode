@@ -8,42 +8,51 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class CompanyData {
-    //Returns
-    ArrayList<String> oneDay_midReturn = new ArrayList<>();
-    ArrayList<String> midPrice = new ArrayList<>();
-    ArrayList<String> oneDay_bidReturn = new ArrayList<>();
-    ArrayList<String> oneDay_askReturn = new ArrayList<>();
-
-    //Lagged Returns
-    private ArrayList<String> completeReturns = new ArrayList<>();
-    ArrayList<String> oneWeek_midRetrun = new ArrayList<>();
-    ArrayList<String> oneMonth_midReturn = new ArrayList<>();
-    ArrayList<String> threeMonth_midReturn = new ArrayList<>();
-    ArrayList<String> sixMonth_midReturn = new ArrayList<>();
-
-    //Market Data
-    ArrayList<String> mktCap = new ArrayList<>();
-    ArrayList<String> volume = new ArrayList<>();
-
-    //Company specific Data
-    ArrayList<String> PB = new ArrayList<>();
-    ArrayList<String> PE = new ArrayList<>();
-    ArrayList<String> PS = new ArrayList<>();
-
-    //Volatility
-    ArrayList<String> oneWeek_Volatility = new ArrayList<>();
-    ArrayList<String> oneMonth_Volatility = new ArrayList<>();
-    ArrayList<String> threeMonth_Volatility = new ArrayList<>();
-    ArrayList<String> sixMonth_Volatility = new ArrayList<>();
-
-    ArrayList<LocalDate> datum = new ArrayList<>();
+    //Object wide Variables for functions
+    Sheet sheet = null;
+    int lastRow = 0;
     String name;
 
-    void nameConstructor(String compName){
-        name = compName;
+    //Returns
+    ArrayList<String> oneDay_midReturn = new ArrayList<>(lastRow);
+    ArrayList<String> midPrice = new ArrayList<>(lastRow);
+    ArrayList<String> oneDay_bidReturn = new ArrayList<>(lastRow);
+    ArrayList<String> bidPrice = new ArrayList<>(lastRow);
+    ArrayList<String> oneDay_askReturn = new ArrayList<>(lastRow);
+    ArrayList<String> askPrice = new ArrayList<>(lastRow);
+
+    //Lagged Returns
+    private ArrayList<String> completeReturns = new ArrayList<>(lastRow);
+    ArrayList<String> oneWeek_midRetrun = new ArrayList<>(lastRow);
+    ArrayList<String> oneMonth_midReturn = new ArrayList<>(lastRow);
+    ArrayList<String> threeMonth_midReturn = new ArrayList<>(lastRow);
+    ArrayList<String> sixMonth_midReturn = new ArrayList<>(lastRow);
+
+    //Market Data
+    ArrayList<String> mktCap = new ArrayList<>(lastRow);
+    ArrayList<String> volume = new ArrayList<>(lastRow);
+
+    //Company specific Data
+    ArrayList<String> PB = new ArrayList<>(lastRow);
+    ArrayList<String> PE = new ArrayList<>(lastRow);
+    ArrayList<String> PS = new ArrayList<>(lastRow);
+
+    //Volatility
+    ArrayList<String> oneWeek_Volatility = new ArrayList<>(lastRow);
+    ArrayList<String> oneMonth_Volatility = new ArrayList<>(lastRow);
+    ArrayList<String> threeMonth_Volatility = new ArrayList<>(lastRow);
+    ArrayList<String> sixMonth_Volatility = new ArrayList<>(lastRow);
+
+    ArrayList<LocalDate> datum = new ArrayList<>(lastRow);
+
+
+    CompanyData(Sheet sheet){
+        this.sheet = sheet;
+        lastRow = sheet.getLastRowNum();
+        name = sheet.getRow(0).getCell(0).getStringCellValue();
     }
 
-    void addReturns(Sheet sheet, String returnType){
+    void addReturns(String returnType){
         double priceOne = 0;
         double priceTwo = 0;
         boolean tester;
@@ -64,13 +73,13 @@ public class CompanyData {
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=x+1;i<sheet.getLastRowNum()+1;i++) {
+                for(int i=x+1;i<lastRow+1;i++) {
                     tester = (sheet.getRow(i).getCell(1).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(i).getCell(1).getNumericCellValue() != 0);
 
                     if (tester) {
                         priceTwo = sheet.getRow(i).getCell(1).getNumericCellValue();
 
-                        this.midReturnCalc(priceOne, priceTwo);
+                        midReturnCalc(priceOne, priceTwo);
                         midPrice.add(Double.toString(priceOne));
 
                         priceOne = sheet.getRow(i).getCell(1).getNumericCellValue();
@@ -86,6 +95,7 @@ public class CompanyData {
                     priceOne = sheet.getRow(1).getCell(2).getNumericCellValue();
                 }else{
                     do {
+                        bidPrice.add("na");
                         oneDay_bidReturn.add("na");
                         x++;
                     }while ((sheet.getRow(x).getCell(2).getCellTypeEnum()!=CellType.NUMERIC || (sheet.getRow(x).getCell(2).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(x).getCell(2).getNumericCellValue()==0)));
@@ -93,19 +103,21 @@ public class CompanyData {
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=x+1;i<sheet.getLastRowNum()+1;i++) {
+                for(int i=x+1;i<lastRow+1;i++) {
                     tester = (sheet.getRow(i).getCell(2).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(i).getCell(2).getNumericCellValue() != 0);
 
                     if (tester) {
                         priceTwo = sheet.getRow(i).getCell(2).getNumericCellValue();
 
-                        this.bidReturnCalc(priceOne, priceTwo);
+                        bidReturnCalc(priceOne, priceTwo);
+                        bidPrice.add(Double.toString(priceOne));
 
                         priceOne = sheet.getRow(i).getCell(2).getNumericCellValue();
                     }else{
                         oneDay_bidReturn.add("na");
                     }
                 }
+                bidPrice.add(Double.toString(priceOne));
                 break;
             case "Ask":
                 tester = (sheet.getRow(1).getCell(3).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(1).getCell(3).getNumericCellValue()!=0);
@@ -113,14 +125,15 @@ public class CompanyData {
                     priceOne = sheet.getRow(1).getCell(3).getNumericCellValue();
                 }else{
                     do {
-                        oneDay_bidReturn.add("na");
+                        askPrice.add("na");
+                        oneDay_askReturn.add("na");
                         x++;
                     }while ((sheet.getRow(x).getCell(3).getCellTypeEnum()!=CellType.NUMERIC || (sheet.getRow(x).getCell(3).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(x).getCell(3).getNumericCellValue()==0)));
                     priceOne = sheet.getRow(x).getCell(3).getNumericCellValue();
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=x+1;i<sheet.getLastRowNum()+1;i++) {
+                for(int i=x+1;i<lastRow+1;i++) {
                     tester = (sheet.getRow(i).getCell(3).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(i).getCell(3).getNumericCellValue() != 0);
 
                     if (tester) {
@@ -152,7 +165,7 @@ public class CompanyData {
         oneDay_askReturn.add(Double.toString(Math.log(secondPrice/firstPrice)));
     }
 
-    void addMarketData(Sheet sheet, String dataType){
+    void addMarketData(String dataType){
         double valueOne = 0;
         double valueTwo = 0;
         boolean tester;
@@ -172,7 +185,7 @@ public class CompanyData {
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=x+1;i<sheet.getLastRowNum()+1;i++) {
+                for(int i=x+1;i<lastRow+1;i++) {
                     tester = (sheet.getRow(i).getCell(4).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(i).getCell(4).getNumericCellValue() != 0);
 
                     if (tester) {
@@ -199,7 +212,7 @@ public class CompanyData {
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=2;i<sheet.getLastRowNum()+1;i++) {
+                for(int i=2;i<lastRow+1;i++) {
                     tester = (sheet.getRow(i).getCell(11).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(i).getCell(11).getNumericCellValue() != 0);
 
                     if (tester) {
@@ -219,7 +232,7 @@ public class CompanyData {
         }
     }
 
-    void addCompanyData(Sheet sheet, String dataType){
+    void addCompanyData(String dataType){
         double valueOne = 0;
         double valueTwo = 0;
         boolean tester;
@@ -239,7 +252,7 @@ public class CompanyData {
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=x+1;i<sheet.getLastRowNum()+1;i++) {
+                for(int i=x+1;i<lastRow+1;i++) {
                     tester = (sheet.getRow(i).getCell(8).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(i).getCell(8).getNumericCellValue() != 0);
 
                     if (tester) {
@@ -266,7 +279,7 @@ public class CompanyData {
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=x+1;i<sheet.getLastRowNum()+1;i++) {
+                for(int i=x+1;i<lastRow+1;i++) {
                     tester = (sheet.getRow(i).getCell(6).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(i).getCell(6).getNumericCellValue() != 0);
 
                     if (tester) {
@@ -293,7 +306,7 @@ public class CompanyData {
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=x+1;i<sheet.getLastRowNum()+1;i++) {
+                for(int i=x+1;i<lastRow+1;i++) {
                     tester = (sheet.getRow(i).getCell(5).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(i).getCell(5).getNumericCellValue() != 0);
 
                     if (tester) {
@@ -317,7 +330,7 @@ public class CompanyData {
         datum.add(sampleDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
     }
 
-    private void completeReturn(Sheet sheet){
+    private void completeReturn(){
         boolean tester;
         int x = 1;
 
@@ -334,7 +347,7 @@ public class CompanyData {
         }
 
         //Loop through all rows of a sheet
-        for(int i=x;i<sheet.getLastRowNum()+1;i++) {
+        for(int i=x;i<lastRow+1;i++) {
             tester = (sheet.getRow(i).getCell(1).getCellTypeEnum() == CellType.NUMERIC && sheet.getRow(i).getCell(1).getNumericCellValue() != 0);
 
             if (tester) {
@@ -345,11 +358,11 @@ public class CompanyData {
         }
     }
 
-    void addLaggedReturns(Sheet sheet, String returnType){
+    void addLaggedReturns( String returnType){
         boolean tester;
         int x = 0;
 
-        this.completeReturn(sheet);
+        this.completeReturn();
 
         switch (returnType){
             case "oneWeek":
@@ -378,7 +391,7 @@ public class CompanyData {
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=x+20;i<sheet.getLastRowNum();i++) {
+                for(int i=x+20;i<completeReturns.size();i++) {
                     oneMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-20)))));
                 }
                 break;
@@ -393,7 +406,7 @@ public class CompanyData {
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=x+62;i<sheet.getLastRowNum();i++) {
+                for(int i=x+62;i<completeReturns.size();i++) {
                     threeMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-62)))));
                 }
                 break;
@@ -408,7 +421,7 @@ public class CompanyData {
                 }
 
                 //Loop through all rows of a sheet
-                for(int i=x+124;i<sheet.getLastRowNum();i++) {
+                for(int i=x+124;i<completeReturns.size();i++) {
                     sixMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-124)))));
                 }
                 break;
@@ -418,73 +431,32 @@ public class CompanyData {
         }
     }
 
-    void addVolatility(Sheet sheet, String duration){
-        boolean tester;
-        int x = 0;
-
-
-        this.completeReturn(sheet);
-        ArrayList<String> replacedReturn = new ArrayListExt().replace(completeReturns,"na", "0");
+    void addVolatility(String duration){
+        this.completeReturn();
 
         switch (duration){
             case "oneWeek":
-                //find first row with numeric value
-                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
-                if(tester){
-                    do {
-                        oneWeek_midRetrun.add("na");
-                        x++;
-                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
-                }
-
                 //Loop through all rows of a sheet
-                for(int i=x+4;i<completeReturns.size();i++) {
-                    oneWeek_midRetrun.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-4)))));
+                for(int i=4;i<completeReturns.size();i++) {
+                    oneWeek_Volatility.add(String.valueOf(Statistics.Variance(completeReturns.subList(i-4,i))));
                 }
                 break;
             case "oneMonth":
-                //find first row with numeric value
-                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
-                if(tester){
-                    do {
-                        oneMonth_midReturn.add("na");
-                        x++;
-                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
-                }
-
                 //Loop through all rows of a sheet
-                for(int i=x+20;i<sheet.getLastRowNum();i++) {
-                    oneMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-20)))));
+                for(int i=21;i<completeReturns.size();i++) {
+                    oneMonth_Volatility.add(String.valueOf(Statistics.Variance(completeReturns.subList(i-21,i))));
                 }
                 break;
             case "threeMonth":
-                //find first row with numeric value
-                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
-                if(tester){
-                    do {
-                        threeMonth_midReturn.add("na");
-                        x++;
-                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
-                }
-
                 //Loop through all rows of a sheet
-                for(int i=x+62;i<sheet.getLastRowNum();i++) {
-                    threeMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-62)))));
+                for(int i=63;i<completeReturns.size();i++) {
+                    threeMonth_Volatility.add(String.valueOf(Statistics.Variance(completeReturns.subList(i-63,i))));
                 }
                 break;
             case "sixMonth":
-                //find first row with numeric value
-                tester = (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
-                if(tester){
-                    do {
-                        sixMonth_midReturn.add("na");
-                        x++;
-                    }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
-                }
-
                 //Loop through all rows of a sheet
-                for(int i=x+124;i<sheet.getLastRowNum();i++) {
-                    sixMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-124)))));
+                for(int i=125;i<completeReturns.size();i++) {
+                    sixMonth_Volatility.add(String.valueOf(Statistics.Variance(completeReturns.subList(i-125,i))));
                 }
                 break;
             default:
@@ -493,22 +465,13 @@ public class CompanyData {
         }
     }
 
-    void returnsOut(){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    void writeData(){
+        StringBuffer sb = new StringBuffer(1000);
 
-        System.out.printf("%s%20s%14s%14s%n", "Date", "Mid-Return", "Bid-Return", "Ask-Return");
-
-        for(int i=0;i<(datum.size()-1);i++){
-            System.out.printf("%s%14s%14s%14s%n", datum.get(i+1).format(formatter), oneDay_midReturn.get(i), oneDay_bidReturn.get(i), oneDay_askReturn.get(i));
-        }
-    }
-
-    void dataOut(){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-
-        System.out.printf("%s%20s%14s%n", "Date", "Market Cap", "Volume");
-        for(int i=0;i<(datum.size()-1);i++){
-            System.out.printf("%s%14s%14s%n",datum.get(i+1).format(formatter), mktCap.get(i), volume.get(i));
-        }
+        sb.append(name).append(";");
+        sb.append("MidPrice").append(";");
+        sb.append("MidReturn").append(";");
+        sb.append("MidReturn").append(";");
+        sb.append("MidReturn").append(";");
     }
 }
