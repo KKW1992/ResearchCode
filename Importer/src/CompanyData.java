@@ -85,6 +85,7 @@ public class CompanyData {
                         priceOne = sheet.getRow(i).getCell(1).getNumericCellValue();
                     }else{
                         oneDay_midReturn.add("na");
+                        midPrice.add("na");
                     }
                 }
                 midPrice.add(Double.toString(priceOne));
@@ -115,6 +116,7 @@ public class CompanyData {
                         priceOne = sheet.getRow(i).getCell(2).getNumericCellValue();
                     }else{
                         oneDay_bidReturn.add("na");
+                        bidPrice.add("na");
                     }
                 }
                 bidPrice.add(Double.toString(priceOne));
@@ -139,11 +141,13 @@ public class CompanyData {
                     if (tester) {
                         priceTwo = sheet.getRow(i).getCell(3).getNumericCellValue();
 
-                        this.askReturnCalc(priceOne, priceTwo);
+                        askReturnCalc(priceOne, priceTwo);
+                        askPrice.add(Double.toString(priceOne));
 
                         priceOne = sheet.getRow(i).getCell(3).getNumericCellValue();
                     }else{
                         oneDay_askReturn.add("na");
+                        askPrice.add("na");
                     }
                 }
                 break;
@@ -469,9 +473,16 @@ public class CompanyData {
         StringBuffer sb = new StringBuffer(1000);
 
         sb.append(name).append(";");
-        sb.append("MidPrice").append(";");
-        sb.append("MidReturn").append(";");
-        sb.append("MidReturn").append(";");
-        sb.append("MidReturn").append(";");
+        sb.append("Mid_Price").append(";");
+        sb.append("Bid_Price").append(";");
+        sb.append("Ask_Price").append(";");
+        sb.append("Mid_Return").append(";");
+        sb.append("Bid_Return").append(";");
+        sb.append("Ask_Return").append(";");
+        sb.append("Mkt_Cap").append(";");
+        sb.append("Volume").append(";");
+        sb.append("PB").append(";");
+        sb.append("PE").append(";");
+        sb.append("PS").append(";");
     }
 }
