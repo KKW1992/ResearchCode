@@ -1,6 +1,9 @@
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -63,6 +66,7 @@ public class CompanyData {
                 tester = (sheet.getRow(1).getCell(1).getCellTypeEnum()== CellType.NUMERIC && sheet.getRow(1).getCell(1).getNumericCellValue()!=0);
                 if(tester){
                     priceOne = sheet.getRow(1).getCell(1).getNumericCellValue();
+                    oneDay_midReturn.add("na");
                 }else{
                     do {
                         midPrice.add("na");
@@ -89,11 +93,14 @@ public class CompanyData {
                     }
                 }
                 midPrice.add(Double.toString(priceOne));
+                midPrice.trimToSize();
+                oneDay_midReturn.trimToSize();
                 break;
             case "Bid":
                 tester = (sheet.getRow(1).getCell(2).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(1).getCell(2).getNumericCellValue()!=0);
                 if(tester){
                     priceOne = sheet.getRow(1).getCell(2).getNumericCellValue();
+                    oneDay_bidReturn.add("na");
                 }else{
                     do {
                         bidPrice.add("na");
@@ -120,11 +127,14 @@ public class CompanyData {
                     }
                 }
                 bidPrice.add(Double.toString(priceOne));
+                bidPrice.trimToSize();
+                oneDay_bidReturn.trimToSize();
                 break;
             case "Ask":
                 tester = (sheet.getRow(1).getCell(3).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(1).getCell(3).getNumericCellValue()!=0);
                 if(tester){
                     priceOne = sheet.getRow(1).getCell(3).getNumericCellValue();
+                    oneDay_askReturn.add("na");
                 }else{
                     do {
                         askPrice.add("na");
@@ -150,6 +160,9 @@ public class CompanyData {
                         askPrice.add("na");
                     }
                 }
+                askPrice.add(Double.toString(priceOne));
+                askPrice.trimToSize();
+                oneDay_askReturn.trimToSize();
                 break;
             default:
                 System.out.println("Please specify the Type of Return (Bid, Mid, Ask)");
@@ -180,6 +193,7 @@ public class CompanyData {
                 tester = (sheet.getRow(1).getCell(4).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(1).getCell(4).getNumericCellValue()!=0);
                 if(tester){
                     valueOne = sheet.getRow(1).getCell(4).getNumericCellValue();
+                    mktCap.add("na");
                 }else{
                     do {
                         mktCap.add("na");
@@ -202,11 +216,13 @@ public class CompanyData {
                         mktCap.add("na");
                     }
                 }
+                mktCap.trimToSize();
                 break;
             case "Volume":
                 tester = (sheet.getRow(1).getCell(11).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(1).getCell(11).getNumericCellValue()!=0);
                 if(tester){
                     valueOne = sheet.getRow(1).getCell(11).getNumericCellValue();
+                    volume.add("na");
                 }else{
                     do {
                         volume.add("na");
@@ -226,9 +242,10 @@ public class CompanyData {
 
                         valueOne = sheet.getRow(i).getCell(11).getNumericCellValue();
                     }else{
-                        mktCap.add("na");
+                        volume.add("na");
                     }
                 }
+                volume.trimToSize();
                 break;
             default:
                 System.out.println("Please specify the Type of Return (MktCap, Volume)");
@@ -247,6 +264,7 @@ public class CompanyData {
                 tester = (sheet.getRow(1).getCell(8).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(1).getCell(8).getNumericCellValue()!=0);
                 if(tester){
                     valueOne = sheet.getRow(1).getCell(8).getNumericCellValue();
+                    PB.add("na");
                 }else{
                     do {
                         PB.add("na");
@@ -269,11 +287,13 @@ public class CompanyData {
                         PB.add("na");
                     }
                 }
+                PB.trimToSize();
                 break;
             case "PE":
                 tester = (sheet.getRow(1).getCell(6).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(1).getCell(6).getNumericCellValue()!=0);
                 if(tester){
                     valueOne = sheet.getRow(1).getCell(6).getNumericCellValue();
+                    PE.add("na");
                 }else{
                     do {
                         PE.add("na");
@@ -296,11 +316,13 @@ public class CompanyData {
                         PE.add("na");
                     }
                 }
+                PE.trimToSize();
                 break;
             case "PS":
                 tester = (sheet.getRow(1).getCell(5).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(1).getCell(5).getNumericCellValue()!=0);
                 if(tester){
                     valueOne = sheet.getRow(1).getCell(5).getNumericCellValue();
+                    PS.add("na");
                 }else{
                     do {
                         PS.add("na");
@@ -323,6 +345,7 @@ public class CompanyData {
                         PS.add("na");
                     }
                 }
+                PS.trimToSize();
                 break;
             default:
                 System.out.println("Please specify the Type of Return (PB, PE, PS)");
@@ -332,6 +355,7 @@ public class CompanyData {
 
     void dateAdd (Date sampleDate){
         datum.add(sampleDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        datum.trimToSize();
     }
 
     private void completeReturn(){
@@ -360,6 +384,7 @@ public class CompanyData {
                 completeReturns.add(Double.toString(sheet.getRow(i - 1).getCell(1).getNumericCellValue()));
             }
         }
+        completeReturns.trimToSize();
     }
 
     void addLaggedReturns( String returnType){
@@ -379,10 +404,15 @@ public class CompanyData {
                     }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
                 }
 
+                for(int i = x;i<x+4;i++){
+                    oneWeek_midRetrun.add("na");
+                }
+
                 //Loop through all rows of a sheet
                 for(int i=x+4;i<completeReturns.size();i++) {
                     oneWeek_midRetrun.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-4)))));
                 }
+                oneWeek_midRetrun.trimToSize();
                 break;
             case "oneMonth":
                 //find first row with numeric value
@@ -394,10 +424,15 @@ public class CompanyData {
                     }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
                 }
 
+                for(int i = x;i<x+20;i++){
+                    oneMonth_midReturn.add("na");
+                }
+
                 //Loop through all rows of a sheet
                 for(int i=x+20;i<completeReturns.size();i++) {
                     oneMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-20)))));
                 }
+                oneMonth_midReturn.trimToSize();
                 break;
             case "threeMonth":
                 //find first row with numeric value
@@ -409,10 +444,15 @@ public class CompanyData {
                     }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
                 }
 
+                for(int i = x;i<x+62;i++){
+                    threeMonth_midReturn.add("na");
+                }
+
                 //Loop through all rows of a sheet
                 for(int i=x+62;i<completeReturns.size();i++) {
                     threeMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-62)))));
                 }
+                threeMonth_midReturn.trimToSize();
                 break;
             case "sixMonth":
                 //find first row with numeric value
@@ -424,10 +464,15 @@ public class CompanyData {
                     }while (completeReturns.get(x).equals("na") || completeReturns.get(x).equals("0"));
                 }
 
+                for(int i = x;i<x+124;i++){
+                    sixMonth_midReturn.add("na");
+                }
+
                 //Loop through all rows of a sheet
                 for(int i=x+124;i<completeReturns.size();i++) {
                     sixMonth_midReturn.add(Double.toString(Math.log(new Double(completeReturns.get(i))/new Double(completeReturns.get(i-124)))));
                 }
+                sixMonth_midReturn.trimToSize();
                 break;
             default:
                 System.out.println("Please specify the Type of Return (oneWeek, oneMonth, threeMonth, sixMonth)");
@@ -441,27 +486,47 @@ public class CompanyData {
         switch (duration){
             case "oneWeek":
                 //Loop through all rows of a sheet
+                for(int i=0;i<4;i++){
+                    oneWeek_Volatility.add("na");
+                }
+
                 for(int i=4;i<completeReturns.size();i++) {
                     oneWeek_Volatility.add(String.valueOf(Statistics.Variance(completeReturns.subList(i-4,i))));
                 }
+                oneWeek_Volatility.trimToSize();
                 break;
             case "oneMonth":
                 //Loop through all rows of a sheet
+                for(int i=0;i<21;i++){
+                    oneMonth_Volatility.add("na");
+                }
+
                 for(int i=21;i<completeReturns.size();i++) {
                     oneMonth_Volatility.add(String.valueOf(Statistics.Variance(completeReturns.subList(i-21,i))));
                 }
+                oneMonth_Volatility.trimToSize();
                 break;
             case "threeMonth":
                 //Loop through all rows of a sheet
+                for(int i=0;i<63;i++){
+                    threeMonth_Volatility.add("na");
+                }
+
                 for(int i=63;i<completeReturns.size();i++) {
                     threeMonth_Volatility.add(String.valueOf(Statistics.Variance(completeReturns.subList(i-63,i))));
                 }
+                threeMonth_Volatility.trimToSize();
                 break;
             case "sixMonth":
                 //Loop through all rows of a sheet
+                for(int i=0;i<125;i++){
+                    sixMonth_Volatility.add("na");
+                }
+
                 for(int i=125;i<completeReturns.size();i++) {
                     sixMonth_Volatility.add(String.valueOf(Statistics.Variance(completeReturns.subList(i-125,i))));
                 }
+                sixMonth_Volatility.trimToSize();
                 break;
             default:
                 System.out.println("Please specify the Type of Return (oneWeek, oneMonth, threeMonth, sixMonth)");
@@ -469,20 +534,67 @@ public class CompanyData {
         }
     }
 
-    void writeData(){
+    void writeData() throws FileNotFoundException {
         StringBuffer sb = new StringBuffer(1000);
+
+    PrintWriter pw = new PrintWriter(new File("C:\\Users\\kimwa\\OneDrive\\Documents\\Codes\\Java\\US-OutPut\\test.csv"));
 
         sb.append(name).append(";");
         sb.append("Mid_Price").append(";");
         sb.append("Bid_Price").append(";");
         sb.append("Ask_Price").append(";");
+
         sb.append("Mid_Return").append(";");
         sb.append("Bid_Return").append(";");
         sb.append("Ask_Return").append(";");
+
+        sb.append("OneWeek_MidReturn").append(";");
+        sb.append("OneMonth_MidReturn").append(";");
+        sb.append("ThreeMonth_MidReturn").append(";");
+        sb.append("SixMonth_MidReturn").append(";");
+
+        sb.append("OneWeek_Volatility").append(";");
+        sb.append("OneMonth_Volatility").append(";");
+        sb.append("ThreeMonth_Volatility").append(";");
+        sb.append("SixMonth_Volatility").append(";");
+
         sb.append("Mkt_Cap").append(";");
         sb.append("Volume").append(";");
+
         sb.append("PB").append(";");
         sb.append("PE").append(";");
-        sb.append("PS").append(";");
+        sb.append("PS");
+
+        for(int i=0;i<datum.size();i++){
+            sb.append("\n").append(datum.get(i)).append(";");
+            sb.append(midPrice.get(i)).append(";");
+            sb.append(bidPrice.get(i)).append(";");
+            sb.append(askPrice.get(i)).append(";");
+
+            sb.append(oneDay_midReturn.get(i)).append(";");
+            sb.append(oneDay_bidReturn.get(i)).append(";");
+            sb.append(oneDay_askReturn.get(i)).append(";");
+
+            sb.append(oneWeek_midRetrun.get(i)).append(";");
+            sb.append(oneMonth_Volatility.get(i)).append(";");
+            sb.append(threeMonth_midReturn.get(i)).append(";");
+            sb.append(sixMonth_midReturn.get(i)).append(";");
+
+            sb.append(oneWeek_Volatility.get(i)).append(";");
+            sb.append(oneMonth_Volatility.get(i)).append(";");
+            sb.append(threeMonth_Volatility.get(i)).append(";");
+            sb.append(sixMonth_Volatility.get(i)).append(";");
+
+            sb.append(mktCap.get(i)).append(";");
+            sb.append(volume.get(i)).append(";");
+
+            sb.append(PB.get(i)).append(";");
+            sb.append(PE.get(i)).append(";");
+            sb.append(PS.get(i)).append(";");
+        }
+
+        pw.write(sb.toString());
+        pw.close();
+        System.out.println("Done Writing");
     }
 }

@@ -37,9 +37,9 @@ public class Main {
         comp.addMarketData( "Volume");
 
         //Global Data
-        globalData.addMarketData(sheet, "S&P");
-        globalData.addMarketData(sheet, "Russel");
-        globalData.addMarketData(sheet, "RiskFree");
+        globalData.addMarketData("S&P");
+        globalData.addMarketData( "Russel");
+        globalData.addMarketData( "RiskFree");
 
         //Company Data
         comp.addCompanyData( "PB");
@@ -58,6 +58,8 @@ public class Main {
         comp.addVolatility( "oneMonth");
         comp.addVolatility( "threeMonth");
         comp.addVolatility( "sixMonth");
+
+        comp.writeData();
     }
 }
 

@@ -7,16 +7,24 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class GlobalData {
-    ArrayList<String> russelIndex = new ArrayList<>();
-    ArrayList<String> russelAbs = new ArrayList<>();
-    ArrayList<String> spIndex = new ArrayList<>();
-    ArrayList<String> spAbs = new ArrayList<>();
-    ArrayList<String> riskFree = new ArrayList<>();
-    ArrayList<String> riskFreeAbs = new ArrayList<>();
+    Sheet sheet = null;
+    int lastRow = 0;
+
+    ArrayList<String> russelIndex = new ArrayList<>(lastRow);
+    ArrayList<String> russelAbs = new ArrayList<>(lastRow);
+    ArrayList<String> spIndex = new ArrayList<>(lastRow);
+    ArrayList<String> spAbs = new ArrayList<>(lastRow);
+    ArrayList<String> riskFree = new ArrayList<>(lastRow);
+    ArrayList<String> riskFreeAbs = new ArrayList<>(lastRow);
 
     ArrayList<LocalDate> datum = new ArrayList<>();
 
-    void addMarketData(Sheet sheet, String dataType){
+    GlobalData(Sheet sheet){
+        this.sheet = sheet;
+        lastRow = sheet.getLastRowNum();
+    }
+
+    void addMarketData(String dataType){
         double valueOne = 0;
         double valueTwo = 0;
         boolean tester;
@@ -53,6 +61,8 @@ public class GlobalData {
                     }
                 }
                 spAbs.add(Double.toString(valueOne));
+                spAbs.trimToSize();
+                spIndex.trimToSize();
                 break;
             case "Russel":
                 tester = (sheet.getRow(1).getCell(14).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(1).getCell(14).getNumericCellValue()!=0);
@@ -84,6 +94,8 @@ public class GlobalData {
                     }
                 }
                 russelAbs.add(Double.toString(valueOne));
+                russelAbs.trimToSize();
+                russelIndex.trimToSize();
                 break;
             case "RiskFree":
                 tester = (sheet.getRow(1).getCell(16).getCellTypeEnum()==CellType.NUMERIC && sheet.getRow(1).getCell(16).getNumericCellValue()!=0);
@@ -115,6 +127,8 @@ public class GlobalData {
                     }
                 }
                 riskFreeAbs.add(Double.toString(valueOne));
+                riskFreeAbs.trimToSize();
+                riskFree.trimToSize();
                 break;
             default:
                 System.out.println("Please specify the Type of Return (S&P, Russel, RiskFree)");
