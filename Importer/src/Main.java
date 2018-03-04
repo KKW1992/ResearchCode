@@ -59,7 +59,7 @@ public class Main {
         comp.addVolatility( "threeMonth");
         comp.addVolatility( "sixMonth");
 
-        comp.writeData();
+        comp.writeData("C:\\Users\\kimwa\\OneDrive\\Documents\\Codes\\Java\\US-OutPut\\test.csv", true);
     }
 }
 

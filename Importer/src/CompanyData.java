@@ -1,9 +1,7 @@
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -534,10 +532,10 @@ public class CompanyData {
         }
     }
 
-    void writeData() throws FileNotFoundException {
+    void writeData(String Path, Boolean append) throws IOException {
         StringBuffer sb = new StringBuffer(1000);
 
-    PrintWriter pw = new PrintWriter(new File("C:\\Users\\kimwa\\OneDrive\\Documents\\Codes\\Java\\US-OutPut\\test.csv"));
+        PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("C:\\Users\\kimwa\\OneDrive\\Documents\\Codes\\Java\\US-OutPut\\test.csv", append)));
 
         sb.append(name).append(";");
         sb.append("Mid_Price").append(";");
@@ -593,7 +591,7 @@ public class CompanyData {
             sb.append(PS.get(i)).append(";");
         }
 
-        pw.write(sb.toString());
+        pw.println(sb.toString());
         pw.close();
         System.out.println("Done Writing");
     }
