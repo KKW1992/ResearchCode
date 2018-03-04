@@ -16,7 +16,7 @@ public class Main {
         XSSFWorkbook wb = new XSSFWorkbook(pkg);
         Sheet sheet = wb.getSheetAt(0);
         CompanyData comp = new CompanyData(sheet);
-        GlobalData globalData = new GlobalData();
+        GlobalData globalData = new GlobalData(sheet);
 
 
         //Daten Import

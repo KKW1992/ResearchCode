@@ -138,6 +138,7 @@ public class GlobalData {
 
     void dateAdd (Date sampleDate){
         datum.add(sampleDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        datum.trimToSize();
     }
 
 }
