@@ -4,11 +4,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class CompanyData {
+class CompanyData {
     //Object wide Variables for functions
     Sheet sheet = null;
     int lastRow = 0;
@@ -532,7 +531,7 @@ public class CompanyData {
         }
     }
 
-    void writeData(String Path, Boolean append) throws IOException {
+    void writeData(String Path, boolean append) throws IOException {
         StringBuffer sb = new StringBuffer(1000);
 
         PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("C:\\Users\\kimwa\\OneDrive\\Documents\\Codes\\Java\\US-OutPut\\test.csv", append)));
